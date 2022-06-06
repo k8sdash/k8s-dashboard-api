@@ -1,0 +1,25 @@
+{
+  "name": "k8s-dashboard",
+  "version": "1.0.0",
+  "description": "A simple Kubernetes React webapp client for a .net 6.0 webapi exposing ingress routes, pods and nodes",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ebCrypto/k8s-dashboard.git"
+  },
+  "keywords": [
+    "aks",
+    "k8s",
+    "react",
+    "dashboard"
+  ],
+  "author": "ebCrypto",
+  "license": "GPL-3.0-or-later",
+  "bugs": {
+    "url": "https://github.com/ebCrypto/k8s-dashboard/issues"
+  },
+  "homepage": "https://github.com/ebCrypto/k8s-dashboard#readme"
+}

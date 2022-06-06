@@ -10,7 +10,7 @@ builder.Services.AddSwaggerDocument(config =>
     config.PostProcess = document =>
     {
         document.Info.Title = "K8SDashboard";
-        document.Info.Description = "A simple Kubernetes Dashboard, exposing ingress routes, pods and nodes";
+        document.Info.Description = "A simple Kubernetes Dashboard, exposing ingress routes, pods and nodes" ;
     };
 });
 builder.Services.AddSingleton<IK8sClientService, K8sClientService>();
