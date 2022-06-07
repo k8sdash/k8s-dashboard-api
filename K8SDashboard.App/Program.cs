@@ -13,7 +13,7 @@ builder.Services.AddSwaggerDocument(config =>
         document.Info.Description = "A simple Kubernetes Dashboard, exposing ingress routes, pods and nodes" ;
     };
 });
-builder.Services.AddSingleton<IK8sClientService, K8sClientService>();
+builder.Services.AddSingleton<IK8SClientService, K8SClientService>();
 builder.Services.AddSingleton<AppSettings>();
 
 var app = builder.Build();

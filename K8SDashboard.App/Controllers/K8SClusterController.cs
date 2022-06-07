@@ -6,11 +6,11 @@ namespace K8SDashboard.App.Controllers
 {
     public class K8SClusterController : Controller
     {
-        private readonly IK8sClientService k8SClientService;
+        private readonly IK8SClientService k8SClientService;
         private readonly ILogger<K8SClusterController> logger;
         private readonly AppSettings appSettings;
 
-        public K8SClusterController(ILogger<K8SClusterController> logger, AppSettings appSettings, IK8sClientService k8SClientService)
+        public K8SClusterController(ILogger<K8SClusterController> logger, AppSettings appSettings, IK8SClientService k8SClientService)
         {
             this.logger = logger;
             this.appSettings = appSettings;

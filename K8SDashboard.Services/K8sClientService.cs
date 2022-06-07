@@ -2,7 +2,7 @@
 
 namespace K8SDashboard.Services
 {
-    public class K8sClientService : IK8sClientService
+    public class K8SClientService : IK8SClientService
     {
         public async Task<List<LightRoute>> ListLightRoutesWithTimeOut(object defaultNamespace, int retriesLeft)
         {
