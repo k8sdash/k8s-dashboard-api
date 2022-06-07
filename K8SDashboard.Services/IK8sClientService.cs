@@ -4,7 +4,7 @@ namespace K8SDashboard.Services
 {
     public interface IK8SClientService
     {
-        Task<List<LightRoute>> ListLightRoutesWithTimeOut(object defaultNamespace, int retriesLeft);
+        Task<List<LightRoute>> ListLightRoutesWithTimeOut(string ns, int retriesLeft);
         
     }
 }
