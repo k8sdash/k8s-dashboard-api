@@ -3,11 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.1.32407.343
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "K8SDashboard.App", "K8SDashboard.App\K8SDashboard.App.csproj", "{4F499D15-7A02-4995-8D4A-056F634BB0D7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "K8SDashboard.Api", "K8SDashboard.Api\K8SDashboard.Api.csproj", "{4F499D15-7A02-4995-8D4A-056F634BB0D7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "K8SDashboard.Models", "K8SDashboard.Models\K8SDashboard.Models.csproj", "{DDDA01DE-45E5-4418-9893-C4E3868278CB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "K8SDashboard.Models", "K8SDashboard.Models\K8SDashboard.Models.csproj", "{DDDA01DE-45E5-4418-9893-C4E3868278CB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "K8SDashboard.Services", "K8SDashboard.Services\K8SDashboard.Services.csproj", "{8C173B29-B40E-4589-8AFB-5F7BA3463029}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "K8SDashboard.Services", "K8SDashboard.Services\K8SDashboard.Services.csproj", "{8C173B29-B40E-4589-8AFB-5F7BA3463029}"
+EndProject
+Project("{54A90642-561A-4BB1-A94E-469ADEE60C69}") = "k8s-dashboard-client", "k8s-dashboard-client\k8s-dashboard-client.esproj", "{B25B9F80-1195-4637-A629-5792626E5F01}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -27,6 +29,12 @@ Global
 		{8C173B29-B40E-4589-8AFB-5F7BA3463029}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8C173B29-B40E-4589-8AFB-5F7BA3463029}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8C173B29-B40E-4589-8AFB-5F7BA3463029}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B25B9F80-1195-4637-A629-5792626E5F01}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B25B9F80-1195-4637-A629-5792626E5F01}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B25B9F80-1195-4637-A629-5792626E5F01}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{B25B9F80-1195-4637-A629-5792626E5F01}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B25B9F80-1195-4637-A629-5792626E5F01}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B25B9F80-1195-4637-A629-5792626E5F01}.Release|Any CPU.Deploy.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

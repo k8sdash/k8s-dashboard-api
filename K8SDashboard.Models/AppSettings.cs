@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace K8SDashboard.Models
+﻿namespace K8SDashboard.Models
 {
     public class AppSettings
     {
@@ -13,5 +7,12 @@ namespace K8SDashboard.Models
         public string K8sLabelApp { get; set; }
         public string K8sLabelInternalIp { get; set; }
         public string K8sLabelAksZone { get; set; }
+
+        public string ApiTitle { get; set; }
+        public string ApiDescription { get; set; }
+        public string ApiContactName { get; set; }
+        public string ApiContactUrl { get; set; }
+        public string ApiLicenseName { get; set; }
+        public string ApiLicenseUrl { get; set; }
     }
 }
