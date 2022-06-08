@@ -29,7 +29,7 @@ namespace K8SDashboard.Services
                 var services = await Get<V1Service>(ns, retriesLeft, GetServices);
                 var ingresses = await Get<V1Ingress>(ns, retriesLeft, GetIngresses);
                 var rules = ingresses.SelectMany(p => p.Spec.Rules);
-                logger.LogDebug("Extracted {CountRules} rules from {CountIngresses} ingresses", rules.Count(), ingresses.Count());
+                logger.LogDebug("Extracted {CountRules} rules from {CountIngresses} ingresses", rules.Count(), ingresses.Count);
 
                 var joinedData =
                     from n in nodes
