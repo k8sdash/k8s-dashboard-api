@@ -17,16 +17,26 @@ export default class App extends Component {
             <table className='table table-striped' aria-labelledby="tabelLabel">
                 <thead>
                     <tr>
-                        <th>Date</th>
-                        <th>Temp. (C)</th>
-                        <th>Temp. (F)</th>
+                        <th>Name</th>
+                        <th>Namespace</th>
+                        <th>Node</th>
+                        <th>Node Ip</th>
+                        <th>Pod Port</th>
+                        <th>Pod Ip</th>
+                        <th>Pod Phase</th>
+                        <th>Image</th>
                     </tr>
                 </thead>
                 <tbody>
                     {lightroutes.map(lightRoute =>
-                        <tr key={lightRoute.app}>
+                        <tr key={lightRoute.name}>
+                            <td>{lightRoute.nameSpace}</td>
+                            <td>{lightRoute.node}</td>
                             <td>{lightRoute.nodeIp}</td>
-                            <td>{lightRoute.pod}</td>
+                            <td>{lightRoute.podPort}</td>
+                            <td>{lightRoute.podIp}</td>
+                            <td>{lightRoute.podPhase}</td>
+                            <td>{lightRoute.image}</td>
                         </tr>
                     )}
                 </tbody>
