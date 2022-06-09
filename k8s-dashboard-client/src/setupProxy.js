@@ -5,10 +5,12 @@ const context = [
 ];
 
 module.exports = function (app) {
+
     const appProxy = createProxyMiddleware(context, {
         target: 'http://localhost:5183',
         secure: false
     });
 
+    app.use(entry);
     app.use(appProxy);
 };
