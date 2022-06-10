@@ -2,6 +2,7 @@
 
 const context = [
     "/k8scluster/lightroutes",
+    "/hubs/lightroutes",
 ];
 
 module.exports = function (app) {
@@ -11,6 +12,5 @@ module.exports = function (app) {
         secure: false
     });
 
-    app.use(entry);
     app.use(appProxy);
 };

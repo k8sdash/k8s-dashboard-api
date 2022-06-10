@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { HubConnection} from '@microsoft/signalr';
 import { AgGridColumn, AgGridReact } from 'ag-grid-react';
 import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-balham.css';
@@ -10,11 +11,24 @@ export default class App extends Component {
         super(props);
         this.state = {
             lightroutes: [],
-            loading: true
+            loading: true, 
+            bookingHubConnection: null
         };
     }
 
     componentDidMount() {
+        const bookingHubConnection = new HubConnection('/hubs/lightroutes');
+
+        this.setState({ bookingHubConnection }, () => {
+            this.state.bookingHubConnection.start()
+                .then(() => console.log('SignalR Started'))
+                .catch(err => console.log('Error connecting SignalR - ' + err));
+
+            this.state.bookingHubConnection.on('booking', (message) => {
+                const bookingMessage = message;
+                this.setState({ bookingMessage });
+            });
+        });
         this.populateClusterData();
     }
 
@@ -52,7 +66,7 @@ export default class App extends Component {
                         <AgGridColumn field="nodeIp"></AgGridColumn>
                         <AgGridColumn field="nameSpace"></AgGridColumn>
                         <AgGridColumn field="pod"></AgGridColumn>
-                        <AgGridColumn field="podPhase" cellClassRules={this.cellClassRulesPodPhase}></AgGridColumn>
+                        <AgGridColumn field="podPhase"></AgGridColumn>
                         <AgGridColumn field="podIp"></AgGridColumn>
                         <AgGridColumn field="podPort"></AgGridColumn>
                         <AgGridColumn field="service"></AgGridColumn>

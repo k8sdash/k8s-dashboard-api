@@ -2,8 +2,8 @@ using K8SDashboard.Models;
 using K8SDashboard.Services;
 using Serilog;
 using Prometheus;
-using Microsoft.Extensions.Configuration;
 using Microsoft.OpenApi.Models;
+using K8SDashboard.Api;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,6 +17,17 @@ builder.Services.AddEndpointsApiExplorer();
 var appSettings = new AppSettings();
 builder.Configuration.Bind("AppSettings", appSettings);
 builder.Services.AddSingleton(appSettings);
+builder.Services.AddSignalR();
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("ClientPermission", policy =>
+    {
+        policy.AllowAnyHeader()
+            .AllowAnyMethod()
+            .WithOrigins("https://localhost:3000")
+            .AllowCredentials();
+    });
+});
 
 builder.Services.AddSwaggerGen(options =>
 {
@@ -59,5 +70,7 @@ if (app.Environment.IsDevelopment())
 app.UseAuthorization();
 
 app.MapControllers();
+app.MapHub<LightRoutesHub>("/hubs/lightroutes"); 
+app.UseCors("ClientPermission");
 
 app.Run();
