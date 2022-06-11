@@ -26,7 +26,7 @@ namespace K8SDashboard.Api.Controllers
             try
             {
                 logger.LogDebug("controller will get lightRoutes from service...");
-                var lightRoutes = await k8SClientService.ListLightRoutesWithTimeOut(appSettings.DefaultNamespace, 2);
+                var lightRoutes = await k8SClientService.ListLightRoutesWithTimeOut(2);
                 if(lightRoutes!= null)
                 {
                     logger.LogTrace("Got {Count} Light Routes", lightRoutes.Count);

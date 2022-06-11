@@ -17,6 +17,7 @@ builder.Services.AddEndpointsApiExplorer();
 var appSettings = new AppSettings();
 builder.Configuration.Bind("AppSettings", appSettings);
 builder.Services.AddSingleton(appSettings);
+builder.Services.AddSingleton<K8SEventManager>();
 builder.Services.AddSignalR();
 builder.Services.AddCors(options =>
 {
@@ -72,5 +73,8 @@ app.UseAuthorization();
 app.MapControllers();
 app.MapHub<LightRoutesHub>("/hubs/lightroutes"); 
 app.UseCors("ClientPermission");
+using var scope = app.Services.CreateScope();
+scope.ServiceProvider?.GetService<K8SEventManager>()?
+    .Start();
 
 app.Run();

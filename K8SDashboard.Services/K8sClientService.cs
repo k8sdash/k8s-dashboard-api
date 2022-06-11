@@ -12,15 +12,39 @@ namespace K8SDashboard.Services
         private readonly AppSettings appSettings;
         private readonly Kubernetes client;
 
+        public event EventHandler K8sPodChanged;
+
         public K8SClientService(ILogger<K8SClientService> logger, AppSettings appSettings)
         {
             this.logger = logger;
             this.appSettings = appSettings;
             var config = KubernetesClientConfiguration.IsInCluster()? KubernetesClientConfiguration.InClusterConfig() : KubernetesClientConfiguration.BuildConfigFromConfigFile(); 
             client = new Kubernetes(config);
+            WatchPodsUsingCallback();
         }
 
-        public async Task<List<LightRoute>> ListLightRoutesWithTimeOut(string ns, int retriesLeft)
+        private async Task WatchPodsUsingCallback()
+        {
+            var pods = await client.CoreV1.ListPodForAllNamespacesWithHttpMessagesAsync(watch: true);
+            using (pods.Watch((Action<WatchEventType, V1Pod>)((type,item) => { K8SPodEvent(type, item); })))
+            { var manualResetEventSlim = new ManualResetEventSlim(false);
+                manualResetEventSlim.Wait();
+            }
+        }
+
+        private void K8SPodEvent(WatchEventType type, V1Pod item)
+        {
+            OnK8sPodChanged(new K8SPodEventArgs() { EventType = type.ToString(), PodName = item.Metadata.Name });
+            logger.LogInformation("Received Event '{@Type}' on Pod '{Pod}' from kubeAPI", type, item.Metadata.Name);
+        }
+
+        private void OnK8sPodChanged(K8SPodEventArgs k8SPodEventArgs)
+        {
+            EventHandler handler = K8sPodChanged;
+            handler?.Invoke(this, k8SPodEventArgs);
+        }
+
+        public async Task<List<LightRoute>> ListLightRoutesWithTimeOut(int retriesLeft)
         {
             try
             {
@@ -73,7 +97,7 @@ namespace K8SDashboard.Services
             catch (Exception ex)
             {
                 if (retriesLeft > 0)
-                    return await ListLightRoutesWithTimeOut(ns, retriesLeft - 1);
+                    return await ListLightRoutesWithTimeOut(retriesLeft - 1);
                 else
                     logger.LogWarning(ex, "Impossible to load.");
                 return null;

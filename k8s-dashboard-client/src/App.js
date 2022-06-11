@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
-import { HubConnection} from '@microsoft/signalr';
-import { AgGridColumn, AgGridReact } from 'ag-grid-react';
+import * as signalR from "@microsoft/signalr";
 import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-balham.css';
+import { GridLightRoutes } from './ag-grid-light-routes';
 
 export default class App extends Component {
     static displayName = App.name;
@@ -11,77 +11,28 @@ export default class App extends Component {
         super(props);
         this.state = {
             lightroutes: [],
-            loading: true, 
-            bookingHubConnection: null
+            loading: true
         };
+
+        this.connection = new signalR.HubConnectionBuilder()
+            .withUrl('/hubs/lightroutes')
+            .withAutomaticReconnect()
+            .configureLogging(signalR.LogLevel.Trace)
+            .build();
+
+        this.connection.on("propagate", (pod, eventType) => { this.handlePodEvent(pod, eventType) });
+
+        this.connection.start().catch(err => console.error(`error connecting to signalR hub ${err}`));
     }
 
-    componentDidMount() {
-        const bookingHubConnection = new HubConnection('/hubs/lightroutes');
-
-        this.setState({ bookingHubConnection }, () => {
-            this.state.bookingHubConnection.start()
-                .then(() => console.log('SignalR Started'))
-                .catch(err => console.log('Error connecting SignalR - ' + err));
-
-            this.state.bookingHubConnection.on('booking', (message) => {
-                const bookingMessage = message;
-                this.setState({ bookingMessage });
-            });
-        });
+    handlePodEvent(pod, eventType) {
+        console.log(`SignalR Pod ${pod} Event ${eventType}`);
+        //this.setState({ loading: true });
         this.populateClusterData();
     }
 
-    renderGrid() {
-        return (
-            <div>
-                <div
-                    className="ag-theme-balham"
-                    style={{ height: '100%', width: '100%' }}
-                >
-                    <AgGridReact
-                        defaultColDef={{
-                            filter: true,
-                            filterParams: {
-                                buttons: ['apply', 'reset', 'clear'],
-                                excelMode: 'windows',
-                                closeOnApply: true,
-                                includeBlanksInEquals: true
-                            },
-                            resizable: true,
-                            sortable: true,
-                            autoHeight: true,
-                            wrapText: true, 
-                            floatingFilter: true
-                        }}
-                        pagination={true}
-                        paginationPageSize={9999}
-                        domLayout="autoHeight"
-                        skipHeaderOnAutoSize={true}
-                        onGridReady={this.onGridReady}
-                        onFirstDataRendered={this.onFirstDataRendered} 
-
-                        rowData={this.state.lightroutes}>
-                        <AgGridColumn field="node"></AgGridColumn>
-                        <AgGridColumn field="nodeIp"></AgGridColumn>
-                        <AgGridColumn field="nameSpace"></AgGridColumn>
-                        <AgGridColumn field="pod"></AgGridColumn>
-                        <AgGridColumn field="podPhase"></AgGridColumn>
-                        <AgGridColumn field="podIp"></AgGridColumn>
-                        <AgGridColumn field="podPort"></AgGridColumn>
-                        <AgGridColumn field="service"></AgGridColumn>
-                        <AgGridColumn field="ingress"></AgGridColumn>
-                        <AgGridColumn field="image"></AgGridColumn>
-                    </AgGridReact>
-                </div>
-            </div>
-        );
-    }
-
-    cellClassRulesPodPhase = {
-        'pending': (params) => { return params?.data?.podPhase === "Pending" },
-        'failed': (params) => { return params?.data?.podPhase === "Failed" },
-        'running': (params) => { return params?.data?.podPhase === "Running" }
+    componentDidMount() {
+        this.populateClusterData();
     }
 
 
@@ -89,17 +40,17 @@ export default class App extends Component {
         console.log("grid is ready");
     }
 
-    onFirstDataRendered (params){
+    onFirstDataRendered(params) {
         console.log("first data rendered");
         params.columnApi.autoSizeAllColumns();
-}
+    }
 
-    render() { 
+    render() {
         return (
             <div>
                 <h1 id="tabelLabel" >K8S Dashboard</h1>
                 <p>This the list of nodes, pods and ingress routes within the Kubernetes cluster</p>
-                {this.renderGrid()}
+                <GridLightRoutes onFirstDataRendered={this.onFirstDataRendered} onGridReady={this.onGridReady} lightRoutes={this.state.lightroutes}></GridLightRoutes>
             </div>
         );
     }

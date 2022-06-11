@@ -3,11 +3,11 @@
 
 namespace K8SDashboard.Api
 {
-    public class LightRoutesHub : Hub
+    public class LightRoutesHub : Hub<IHubClient>
     {
-        public async Task SendMessage(string pod, string eventType)
+        public LightRoutesHub()
         {
-            await Clients.All.SendAsync("ReceiveMessage", pod, eventType);
+
         }
     }
 }
