@@ -1,16 +1,15 @@
 ﻿const { createProxyMiddleware } = require('http-proxy-middleware');
 
-const context = [
-    "/k8scluster/lightroutes",
-    "/hubs/lightroutes",
+const contextHttp = [
+    "/k8scluster/lightroutes"
 ];
 
 module.exports = function (app) {
 
-    const appProxy = createProxyMiddleware(context, {
+    const appProxyHttp = createProxyMiddleware(contextHttp, {
         target: 'http://localhost:5183',
         secure: false
     });
 
-    app.use(appProxy);
+    app.use(appProxyHttp);
 };

@@ -18,7 +18,12 @@ var appSettings = new AppSettings();
 builder.Configuration.Bind("AppSettings", appSettings);
 builder.Services.AddSingleton(appSettings);
 builder.Services.AddSingleton<K8SEventManager>();
-builder.Services.AddSignalR();
+builder.Services.AddSignalR(hubOptions =>
+{
+    hubOptions.ClientTimeoutInterval = TimeSpan.FromSeconds(5);
+    hubOptions.KeepAliveInterval = TimeSpan.FromSeconds(60);
+    hubOptions.HandshakeTimeout = TimeSpan.FromSeconds(5);
+});
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("ClientPermission", policy =>
@@ -56,7 +61,6 @@ builder.Host.UseSerilog((ctx, lc) => lc
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -65,16 +69,15 @@ if (app.Environment.IsDevelopment())
         options.SwaggerEndpoint("/swagger/v1/swagger.json", "v1");
         options.RoutePrefix = string.Empty;
     });
-    app.UseMetricServer();
 }
 
+app.UseMetricServer();
 app.UseAuthorization();
 
 app.MapControllers();
 app.MapHub<LightRoutesHub>("/hubs/lightroutes"); 
 app.UseCors("ClientPermission");
 using var scope = app.Services.CreateScope();
-scope.ServiceProvider?.GetService<K8SEventManager>()?
-    .Start();
+scope.ServiceProvider?.GetService<K8SEventManager>()?.Start();
 
 app.Run();

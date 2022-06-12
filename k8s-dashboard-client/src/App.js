@@ -15,10 +15,11 @@ export default class App extends Component {
         };
 
         this.connection = new signalR.HubConnectionBuilder()
-            .withUrl('/hubs/lightroutes')
+            .withUrl('http://localhost:5183/hubs/lightroutes')
             .withAutomaticReconnect()
             .configureLogging(signalR.LogLevel.Trace)
             .build();
+          
 
         this.connection.on("propagate", (pod, eventType) => { this.handlePodEvent(pod, eventType) });
 
@@ -56,7 +57,7 @@ export default class App extends Component {
     }
 
     async populateClusterData() {
-        const response = await fetch('/k8scluster/lightroutes');
+        const response = await fetch('http://localhost:5183/k8scluster/lightroutes');
         const data = await response.json();
         this.setState({ lightroutes: data, loading: false });
     }
