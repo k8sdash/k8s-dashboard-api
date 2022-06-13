@@ -20,9 +20,9 @@ builder.Services.AddSingleton(appSettings);
 builder.Services.AddSingleton<K8SEventManager>();
 builder.Services.AddSignalR(hubOptions =>
 {
-    hubOptions.ClientTimeoutInterval = TimeSpan.FromSeconds(5);
-    hubOptions.KeepAliveInterval = TimeSpan.FromSeconds(60);
-    hubOptions.HandshakeTimeout = TimeSpan.FromSeconds(5);
+    //hubOptions.ClientTimeoutInterval = TimeSpan.FromSeconds(5);
+    //hubOptions.KeepAliveInterval = TimeSpan.FromSeconds(60);
+    //hubOptions.HandshakeTimeout = TimeSpan.FromSeconds(5);
 });
 builder.Services.AddCors(options =>
 {

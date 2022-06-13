@@ -8,7 +8,7 @@ export default class App extends Component {
     static displayName = App.name;
 
     constructor(props) {
-        super(props);
+       super(props);
         this.state = {
             lightroutes: [],
             loading: true
@@ -28,14 +28,14 @@ export default class App extends Component {
 
     handlePodEvent(pod, eventType) {
         console.log(`SignalR Pod ${pod} Event ${eventType}`);
-        //this.setState({ loading: true });
+        this.setState({ loading: true });
         this.populateClusterData();
     }
 
     componentDidMount() {
+        console.log("component did mount!");
         this.populateClusterData();
     }
-
 
     onGridReady(params) {
         console.log("grid is ready");
