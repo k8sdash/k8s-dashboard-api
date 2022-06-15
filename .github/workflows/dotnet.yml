@@ -31,11 +31,11 @@ jobs:
           dotnet tool install --global dotnet-sonarscanner
           dotnet sonarscanner begin /k:"ebCrypto_k8s-dashboard" /o:"ebcrypto" /d:sonar.login=${{ secrets.SONAR_TOKEN }} /d:sonar.host.url="https://sonarcloud.io" /d:sonar.cs.vstest.reportsPaths="**/*.trx" /d:sonar.cs.opencover.reportsPaths="**/coverage.opencover.xml"
       - name: Build Models
-        run: dotnet build .\K8SDashboard.Models\K8SDashboard.Models.csproj
+        run: dotnet build ./K8SDashboard.Models
       - name: Build Services
-        run: dotnet build .\K8SDashboard.Services\K8SDashboard.Services.csproj
+        run: dotnet build ./K8SDashboard.Services
       - name: Build Api
-        run: dotnet build .\K8SDashboard.Api\K8SDashboard.Api.csproj
+        run: dotnet build ./K8SDashboard.Api
 
       - name: Sonarqube end
         run: dotnet sonarscanner end /d:sonar.login="${{ secrets.SONAR_TOKEN }}"
