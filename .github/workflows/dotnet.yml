@@ -36,11 +36,6 @@ jobs:
         run: dotnet build ./K8SDashboard.Services
       - name: Build Api
         run: dotnet build ./K8SDashboard.Api
-      - name: Build client
-        run: |
-          cd k8s-dashboard-client
-          yarn install
-          yarn build
 
       - name: Sonarqube end
         run: dotnet sonarscanner end /d:sonar.login="${{ secrets.SONAR_TOKEN }}"
