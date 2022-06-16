@@ -72,6 +72,7 @@ namespace K8SDashboard.Services
                     select new { nps.p, nps.n, nps.s, r=j};
 
                 var lightRoutes = nodePodServiceRules.Select(x =>  new LightRoute() {
+                        Id = Guid.NewGuid(),
                         Node = x.p.Spec.NodeName,
                         NodeIp = string.Join(",", x.n.Status.Addresses?.Where(p => p.Type == appSettings.K8sLabelInternalIp).Select(p => p.Address)),
                         PodPort = string.Join(",", x.s.Spec.Ports?.Select(p => p.Port)),

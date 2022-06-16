@@ -31,7 +31,7 @@ export const GridLightRoutes = ({
                         },
                         resizable: true,
                         sortable: true,
-                        autoHeight: true,
+                        autoHeight: false,
                         wrapText: true,
                         floatingFilter: true
                     }}
@@ -41,8 +41,9 @@ export const GridLightRoutes = ({
                     skipHeaderOnAutoSize={true}
                     onGridReady={onGridReady}
                     onFirstDataRendered={onFirstDataRendered}
-
-                    rowData={lightRoutes}>
+                    rowData={lightRoutes}
+                    getRowNodeId={(lightRoute) => { return lightRoute.Id; } }
+                >
                     <AgGridColumn field="node"></AgGridColumn>
                     <AgGridColumn field="nodeIp"></AgGridColumn>
                     <AgGridColumn field="nameSpace"></AgGridColumn>

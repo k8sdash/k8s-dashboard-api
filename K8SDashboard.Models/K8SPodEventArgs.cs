@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace K8SDashboard.Models
+﻿namespace K8SDashboard.Models
 {
     public class K8SPodEventArgs : EventArgs
     {

@@ -2,6 +2,7 @@
 {
     public class LightRoute
     {
+        public Guid Id { get; set; }
         public string? Ingress { get; set; }
         public string? NameSpace {  get; set; }
         public string? Service { get; set; }

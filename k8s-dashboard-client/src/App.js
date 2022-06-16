@@ -25,7 +25,7 @@ export default class App extends Component {
     static displayName = App.name;
 
     constructor(props) {
-       super(props);
+        super(props);
         this.state = {
             lightroutes: [],
             loading: true
@@ -35,11 +35,9 @@ export default class App extends Component {
             .withUrl('http://localhost:5183/hubs/lightroutes')
             .withAutomaticReconnect()
             .configureLogging(signalR.LogLevel.Trace)
-            .build();
-          
+            .build();          
 
         this.connection.on("propagate", (pod, eventType) => { this.handlePodEvent(pod, eventType) });
-
         this.connection.start().catch(err => console.error(`error connecting to signalR hub ${err}`));
     }
 
@@ -127,7 +125,6 @@ export default class App extends Component {
                     <GridLightRoutes onFirstDataRendered={this.onFirstDataRendered} onGridReady={this.onGridReady} lightRoutes={this.state.lightroutes}></GridLightRoutes>
                     </Container>
                 {/* End hero unit */}
-
                 {/* Hero unit */}
                 <Container disableGutters maxWidth="sm" component="main" sx={{ pt: 8, pb: 6 }}>
                     <Typography
@@ -173,12 +170,11 @@ export default class App extends Component {
                                     ],
                                 },
                             ].map((tier) => (
-                        // Enterprise card is full width at sm breakpoint
                         <Grid
                             item
                             key={tier.title}
                             xs={12}
-                            sm={tier.title === 'Enterprise' ? 12 : 6}
+                                    sm={tier.title === 'Client Side' ? 12 : 6}
                             md={4}
                         >
                             <Card>
@@ -186,7 +182,7 @@ export default class App extends Component {
                                     title={tier.title}
                                     subheader={tier.subheader}
                                     titleTypographyProps={{ align: 'center' }}
-                                    action={tier.title === 'Pro' ? <StarIcon /> : null}
+                                            action={tier.title === 'Client Side' ? <StarIcon /> : null}
                                     subheaderTypographyProps={{
                                         align: 'center',
                                     }}
@@ -293,8 +289,6 @@ export default class App extends Component {
             </Container>
             {/* End footer */}
         </React.Fragment>
-            
-
         );
     }
 
