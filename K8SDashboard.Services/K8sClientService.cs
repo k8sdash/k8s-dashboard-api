@@ -7,7 +7,7 @@ namespace K8SDashboard.Services
 {
     public class K8SClientService : IK8SClientService
     {
-        private const string Message = "Getting {ObjectType} in namespace {Namespace} with TimeOut {TimeOut} sec... [{Retries} Retries left]...";
+        private const string Message = "Getting {ObjectType} with TimeOut {TimeOut} sec... [{Retries} Retries left]...";
         private readonly ILogger<K8SClientService> logger;
         private readonly AppSettings appSettings;
         private readonly Kubernetes client;
@@ -18,16 +18,35 @@ namespace K8SDashboard.Services
         {
             this.logger = logger;
             this.appSettings = appSettings;
-            var config = KubernetesClientConfiguration.IsInCluster()? KubernetesClientConfiguration.InClusterConfig() : KubernetesClientConfiguration.BuildConfigFromConfigFile(); 
+            KubernetesClientConfiguration config;
+            if (KubernetesClientConfiguration.IsInCluster())
+                config = KubernetesClientConfiguration.InClusterConfig();
+            else
+                try
+                {
+                    config = KubernetesClientConfiguration.BuildConfigFromConfigFile();
+                }
+                catch (k8s.Exceptions.KubeConfigException ex)
+                {
+
+                    logger.LogCritical(ex, "Unable to proceed! Not running in kubernetes, and unable to find a default KubeConfig");
+                    return;
+                } 
             client = new Kubernetes(config);
             WatchPodsUsingCallback();
+        }
+
+        public bool Valid()
+        {
+            return client != null;
         }
 
         private async Task WatchPodsUsingCallback()
         {
             var pods = await client.CoreV1.ListPodForAllNamespacesWithHttpMessagesAsync(watch: true);
-            using (pods.Watch((Action<WatchEventType, V1Pod>)((type,item) => { K8SPodEvent(type, item); })))
-            { var manualResetEventSlim = new ManualResetEventSlim(false);
+            using (pods.Watch((Action<WatchEventType, V1Pod>)((type, item) => { K8SPodEvent(type, item); })))
+            {
+                var manualResetEventSlim = new ManualResetEventSlim(false);
                 manualResetEventSlim.Wait();
             }
         }
@@ -62,30 +81,31 @@ namespace K8SDashboard.Services
                     join s in services
                     on p.Metadata.Labels.ContainsKey(appSettings.K8sLabelApp) ? p.Metadata.Labels[appSettings.K8sLabelApp] : string.Empty equals s.Spec.Selector != null && s.Spec.Selector.ContainsKey(appSettings.K8sLabelApp) ? s.Spec.Selector?[appSettings.K8sLabelApp] : string.Empty into joined
                     from j in joined.DefaultIfEmpty()
-                    select new { p, n, s=j };
+                    select new { p, n, s = j };
 
                 var nodePodServiceRules =
                     from nps in nodePodServices
                     join r in rules
-                    on nps.s.Metadata.Name equals r.Http.Paths.First().Backend.Service.Name into joined 
+                    on nps.s.Metadata.Name equals r.Http.Paths.First().Backend.Service.Name into joined
                     from j in joined.DefaultIfEmpty()
-                    select new { nps.p, nps.n, nps.s, r=j};
+                    select new { nps.p, nps.n, nps.s, r = j };
 
-                var lightRoutes = nodePodServiceRules.Select(x =>  new LightRoute() {
-                        Id = Guid.NewGuid(),
-                        Node = x.p.Spec.NodeName,
-                        NodeIp = string.Join(",", x.n.Status.Addresses?.Where(p => p.Type == appSettings.K8sLabelInternalIp).Select(p => p.Address)),
-                        PodPort = string.Join(",", x.s.Spec.Ports?.Select(p => p.Port)),
-                        NodeAz = x.n.Metadata.Labels.ContainsKey(appSettings.K8sLabelAksZone) ? x.n.Metadata.Labels[appSettings.K8sLabelAksZone] : string.Empty,
-                        Pod = x.p.Metadata.Name,
-                        PodIp = x.p.Status.PodIP,
-                        Image = string.Join(",", x.p.Spec.Containers.Select(p => p.Image)),
-                        PodPhase = x.p.Status.Phase,
-                        Ingress = string.Join(",", x.r?.Host),
-                        NameSpace = x.p.Metadata.NamespaceProperty,
-                        Service = x.s.Metadata.Name,
-                        App = x.p.Metadata.Labels.ContainsKey(appSettings.K8sLabelApp) ? x.p.Metadata.Labels[appSettings.K8sLabelApp] : string.Empty
-                    }).ToList();
+                var lightRoutes = nodePodServiceRules.Select(x => new LightRoute()
+                {
+                    Id = Guid.NewGuid(),
+                    Node = x.p.Spec.NodeName,
+                    NodeIp = string.Join(",", x.n.Status.Addresses?.Where(p => p.Type == appSettings.K8sLabelInternalIp).Select(p => p.Address)),
+                    PodPort = string.Join(",", x.s.Spec.Ports?.Select(p => p.Port)),
+                    NodeAz = x.n.Metadata.Labels.ContainsKey(appSettings.K8sLabelAksZone) ? x.n.Metadata.Labels[appSettings.K8sLabelAksZone] : string.Empty,
+                    Pod = x.p.Metadata.Name,
+                    PodIp = x.p.Status.PodIP,
+                    Image = string.Join(",", x.p.Spec.Containers.Select(p => p.Image)),
+                    PodPhase = x.p.Status.Phase,
+                    Ingress = string.Join(",", x.r?.Host),
+                    NameSpace = x.p.Metadata.NamespaceProperty,
+                    Service = x.s.Metadata.Name,
+                    App = x.p.Metadata.Labels.ContainsKey(appSettings.K8sLabelApp) ? x.p.Metadata.Labels[appSettings.K8sLabelApp] : string.Empty
+                }).ToList();
                 logger.LogDebug("Made {Count} LightRoutes joining data from kubeAPI", lightRoutes.Count);
                 return lightRoutes;
             }
@@ -110,7 +130,7 @@ namespace K8SDashboard.Services
         private async Task<IList<V1Node>> GetNodes() => (await client.ListNodeAsync())?.Items;
         private async Task<IList<V1Ingress>> GetIngresses() => (await client.ListIngressForAllNamespacesAsync())?.Items;
 
-        private async Task<IList<T>> Get<T> (int retriesLeft, Func<Task<IList<T>>> func)
+        private async Task<IList<T>> Get<T>(int retriesLeft, Func<Task<IList<T>>> func)
         {
             logger.LogDebug(Message, typeof(T), appSettings.KubeApiTimeout, retriesLeft);
             var list = await func();
