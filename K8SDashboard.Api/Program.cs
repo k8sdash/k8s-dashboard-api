@@ -7,12 +7,8 @@ using K8SDashboard.Api;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-
 
 var appSettings = new AppSettings();
 builder.Configuration.Bind("AppSettings", appSettings);
@@ -31,8 +27,8 @@ builder.Services.AddCors(options =>
     {
         policy.AllowAnyHeader()
             .AllowAnyMethod()
-            .WithOrigins("https://localhost:3000")
-            .AllowCredentials();
+            //.WithOrigins(new string[] { "https://localhost:3000", "http://localhost:3000" }) 
+            .AllowAnyOrigin();
     });
 });
 
@@ -61,16 +57,12 @@ builder.Host.UseSerilog((ctx, lc) => lc
 .ReadFrom.Configuration(ctx.Configuration));
 
 var app = builder.Build();
-
-if (app.Environment.IsDevelopment())
-{
     app.UseSwagger();
-    app.UseSwaggerUI(options =>
-    {
-        options.SwaggerEndpoint("/swagger/v1/swagger.json", "v1");
-        options.RoutePrefix = string.Empty;
-    });
-}
+app.UseSwaggerUI(options =>
+{
+    options.SwaggerEndpoint("/swagger/v1/swagger.json", "v1");
+    options.RoutePrefix = string.Empty;
+});
 
 app.UseMetricServer();
 app.UseAuthorization();

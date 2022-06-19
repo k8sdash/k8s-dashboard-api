@@ -20,10 +20,14 @@ namespace K8SDashboard.Services
             this.appSettings = appSettings;
             KubernetesClientConfiguration config;
             if (KubernetesClientConfiguration.IsInCluster())
+            {
                 config = KubernetesClientConfiguration.InClusterConfig();
+                logger.LogDebug("detected running in kubernetes cluster");
+            }
             else
                 try
                 {
+                    logger.LogDebug("NOT running IN kubernetes cluster...");
                     config = KubernetesClientConfiguration.BuildConfigFromConfigFile();
                 }
                 catch (k8s.Exceptions.KubeConfigException ex)
@@ -70,9 +74,6 @@ namespace K8SDashboard.Services
                 var nodes = await Get<V1Node>(retriesLeft, GetNodes);
                 var pods = await Get<V1Pod>(retriesLeft, GetPods);
                 var services = await Get<V1Service>(retriesLeft, GetServices);
-                var ingresses = await Get<V1Ingress>(retriesLeft, GetIngresses);
-                var rules = ingresses.SelectMany(p => p.Spec.Rules);
-                logger.LogDebug("Extracted {CountRules} rules from {CountIngresses} ingresses", rules.Count(), ingresses.Count);
 
                 var nodePodServices =
                     from n in nodes
@@ -81,39 +82,56 @@ namespace K8SDashboard.Services
                     join s in services
                     on p.Metadata.Labels.ContainsKey(appSettings.K8sLabelApp) ? p.Metadata.Labels[appSettings.K8sLabelApp] : string.Empty equals s.Spec.Selector != null && s.Spec.Selector.ContainsKey(appSettings.K8sLabelApp) ? s.Spec.Selector?[appSettings.K8sLabelApp] : string.Empty into joined
                     from j in joined.DefaultIfEmpty()
-                    select new { p, n, s = j };
+                    select new { p, n, s = j ?? new V1Service() };
+                logger.LogDebug("Joined nods, pods and services. Counting {Count}", nodePodServices?.Count());
 
+                var ingresses = await Get<V1Ingress>(retriesLeft, GetIngresses);
+                var rules = ingresses.SelectMany(p => p.Spec.Rules).Where(r=>r!=null);
+                logger.LogDebug("Extracted {CountRules} rules from {CountIngresses} ingresses", rules.Count(), ingresses.Count);                
                 var nodePodServiceRules =
                     from nps in nodePodServices
                     join r in rules
-                    on nps.s.Metadata.Name equals r.Http.Paths.First().Backend.Service.Name into joined
+                    on nps.s.Metadata?.Name equals r.Http?.Paths?.First()?.Backend?.Service?.Name into joined
                     from j in joined.DefaultIfEmpty()
-                    select new { nps.p, nps.n, nps.s, r = j };
+                    select new { nps.p, nps.n, nps.s, r = j ?? new V1IngressRule() };
 
-                var lightRoutes = nodePodServiceRules.Select(x => new LightRoute()
+                logger.LogDebug("Joined nods, pods, services and rules. Counting {Count}", nodePodServiceRules.Count());
+
+                var lightRoutes = nodePodServiceRules.Select(x =>
                 {
-                    Id = Guid.NewGuid(),
-                    Node = x.p.Spec.NodeName,
-                    NodeIp = string.Join(",", x.n.Status.Addresses?.Where(p => p.Type == appSettings.K8sLabelInternalIp).Select(p => p.Address)),
-                    PodPort = string.Join(",", x.s.Spec.Ports?.Select(p => p.Port)),
-                    NodeAz = x.n.Metadata.Labels.ContainsKey(appSettings.K8sLabelAksZone) ? x.n.Metadata.Labels[appSettings.K8sLabelAksZone] : string.Empty,
-                    Pod = x.p.Metadata.Name,
-                    PodIp = x.p.Status.PodIP,
-                    Image = string.Join(",", x.p.Spec.Containers.Select(p => p.Image)),
-                    PodPhase = x.p.Status.Phase,
-                    Ingress = string.Join(",", x.r?.Host),
-                    NameSpace = x.p.Metadata.NamespaceProperty,
-                    Service = x.s.Metadata.Name,
-                    App = x.p.Metadata.Labels.ContainsKey(appSettings.K8sLabelApp) ? x.p.Metadata.Labels[appSettings.K8sLabelApp] : string.Empty
+                    try
+                    {
+                        var lightRoute = new LightRoute()
+                        {
+                            Id = Guid.NewGuid(),
+                            Node = x.p.Spec.NodeName,
+                            NodeIp = string.Join(",", x.n.Status?.Addresses?.Where(p => p?.Type == appSettings.K8sLabelInternalIp).Select(p => p?.Address)),
+                            PodPort = x.s.Spec != null && x.s.Spec.Ports != null && x.s.Spec.Ports.Any() ? string.Join(",", x.s.Spec.Ports.Select(p => p.Port)) : string.Empty,
+                            NodeAz = x.n.Metadata.Labels.ContainsKey(appSettings.K8sLabelAksZone) ? x.n.Metadata.Labels[appSettings.K8sLabelAksZone] : string.Empty,
+                            Pod = x.p.Metadata.Name,
+                            PodIp = x.p.Status.PodIP,
+                            Image = string.Join(",", x.p.Spec?.Containers?.Select(p => p?.Image ?? string.Empty)),
+                            PodPhase = x.p.Status.Phase,
+                            Ingress = string.Join(",", x.r?.Host ?? string.Empty),
+                            NameSpace = x.p.Metadata.NamespaceProperty,
+                            Service = x.s.Metadata?.Name,
+                            App = x.p.Metadata.Labels.ContainsKey(appSettings.K8sLabelApp) ? x.p.Metadata.Labels[appSettings.K8sLabelApp] : string.Empty
+                        };
+                        return lightRoute;
+                    }
+                    catch (Exception e)
+                    {
+                        logger.LogWarning(e, "Unable to build lightRoute");
+                        return new LightRoute()
+                        {
+                            Id = Guid.NewGuid(),
+                            Node = x.p.Spec.NodeName,
+                            Pod = x.p.Metadata.Name,
+                        };
+                    }
                 }).ToList();
                 logger.LogDebug("Made {Count} LightRoutes joining data from kubeAPI", lightRoutes.Count);
                 return lightRoutes;
-            }
-            catch (k8s.Autorest.HttpOperationException ex)
-            {
-                if (ex.Response.StatusCode == System.Net.HttpStatusCode.Forbidden)
-                    logger.LogWarning(ex, "Impossible to load. The current service account might be missing permissions.");
-                return null;
             }
             catch (Exception ex)
             {
@@ -133,13 +151,22 @@ namespace K8SDashboard.Services
         private async Task<IList<T>> Get<T>(int retriesLeft, Func<Task<IList<T>>> func)
         {
             logger.LogDebug(Message, typeof(T), appSettings.KubeApiTimeout, retriesLeft);
-            var list = await func();
-            if (list == null || !list.Any())
+            IList<T> list = new List<T>();
+            try
             {
-                logger.LogWarning("Unable to collect {Type} from kubeAPI.", typeof(T));
-                return new List<T>();
+                list = await func();
+                if (list == null || !list.Any())
+                {
+                    logger.LogWarning("Unable to collect {Type} from kubeAPI.", typeof(T));
+                    return new List<T>();
+                }
+            logger.LogDebug("Found {Count} {Type}", list?.Count, typeof(T));
             }
-            logger.LogDebug("Found {Count} {Type} in namespace {Namespace}", list.Count, typeof(T));
+            catch (k8s.Autorest.HttpOperationException ex)
+            {
+                if (ex.Response.StatusCode == System.Net.HttpStatusCode.Forbidden)
+                    logger.LogError(ex, "Impossible to load {Type}. The current service account is likely missing permissions.", typeof(T));
+            }
             return list;
         }
     }

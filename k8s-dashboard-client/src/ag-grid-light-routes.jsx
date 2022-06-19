@@ -42,7 +42,7 @@ export const GridLightRoutes = ({
                     onGridReady={onGridReady}
                     onFirstDataRendered={onFirstDataRendered}
                     rowData={lightRoutes}
-                    getRowNodeId={(lightRoute) => { return lightRoute.Id; } }
+                    getRowId={(lightRoute) => { return lightRoute.Id; } }
                 >
                     <AgGridColumn field="node"></AgGridColumn>
                     <AgGridColumn field="nodeIp"></AgGridColumn>

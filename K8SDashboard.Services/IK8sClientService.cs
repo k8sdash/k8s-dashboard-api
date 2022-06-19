@@ -7,7 +7,5 @@ namespace K8SDashboard.Services
         event EventHandler K8sPodChanged;
         Task<List<LightRoute>> ListLightRoutesWithTimeOut(int retriesLeft);
         bool Valid();
-
-
     }
 }

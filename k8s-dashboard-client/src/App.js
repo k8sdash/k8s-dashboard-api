@@ -116,7 +116,7 @@ export default class App extends Component {
                     K8S Dashboard
                 </Typography>
                 <Typography variant="h5" align="center" color="text.secondary" component="p">
-                    Quickly monitor in real time the nodes, pods, services and ingress routes within this Kubernetes Cluster.
+                    Quickly monitor in real time the nodes, pods, services and ingress routes within your Kubernetes Cluster.
                 </Typography>
                 </Container>
                 {/* End hero unit */}
