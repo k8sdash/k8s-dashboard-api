@@ -32,7 +32,7 @@ export default class App extends Component {
         };
 
         this.connection = new signalR.HubConnectionBuilder()
-            .withUrl('http://localhost:5183/hubs/lightroutes')
+            .withUrl(this.getBackendUrl() + '/hubs/lightroutes')
             .withAutomaticReconnect()
             .configureLogging(signalR.LogLevel.Trace)
             .build();          
@@ -88,15 +88,15 @@ export default class App extends Component {
                         <Link
                             variant="button"
                             color="text.primary"
-                                href="https://github.com/ebCrypto/k8s-dashboard"
+                                href="https://github.com/k8sdash/k8s-dashboard"
                             sx={{ my: 1, mx: 1.5 }}
                         >
                         <GitHubIcon/> GitHub
                         </Link>
-                        <Link
-                            variant="button"
-                            color="text.primary"
-                            href="#"
+                            <Link
+                                variant="button"
+                                color="text.primary"
+                                href={this.getBackendUrl() + "/index.html"} 
                             sx={{ my: 1, mx: 1.5 }}
                         >
                             Swagger
@@ -280,8 +280,8 @@ export default class App extends Component {
                 </Grid>
                     <Typography variant="body2" color="text.secondary" align="center" sx={{ mt: 5 }}>
                         {'Copyright © '}
-                        <Link color="inherit" href="https://github.com/ebcrypto/">
-                            ebCrypto
+                        <Link color="inherit" href="https://github.com/k8sdash/">
+                            k8sdash
                         </Link>{' '}
                         {new Date().getFullYear()}
                         {'.'}
@@ -293,8 +293,23 @@ export default class App extends Component {
     }
 
     async populateClusterData() {
-        const response = await fetch('http://localhost:5183/k8scluster/lightroutes');
+        const response = await fetch(this.getBackendUrl() + '/k8scluster/lightroutes');
         const data = await response.json();
         this.setState({ lightroutes: data, loading: false });
+    }
+
+
+    getBackendUrl() {
+        return this.getBackendUrlInternal(window.location.protocol, window.location.host);
+    }
+
+    getBackendUrlInternal(protocol, host) {
+        if (host === 'localhost:3000') {
+            // running in local dev server, connect to local dev backend
+            return process.env.REACT_APP_LOCAL_BACKEND_HOST;
+        } else {
+            // running in k8s, backend is on same host and port
+            return protocol + '//' + host;
+        }
     }
 }

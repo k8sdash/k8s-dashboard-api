@@ -14,6 +14,7 @@ export const GridLightRoutes = ({
         'running': (params) => { return params?.data?.podPhase === "Running" }
     }
 
+    const getRowId = params => params.data.id;
     return (
         <div>
             <div
@@ -42,7 +43,7 @@ export const GridLightRoutes = ({
                     onGridReady={onGridReady}
                     onFirstDataRendered={onFirstDataRendered}
                     rowData={lightRoutes}
-                    getRowId={(lightRoute) => { return lightRoute.Id; } }
+                    getRowId={getRowId}
                 >
                     <AgGridColumn field="node"></AgGridColumn>
                     <AgGridColumn field="nodeIp"></AgGridColumn>

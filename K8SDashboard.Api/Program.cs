@@ -27,8 +27,10 @@ builder.Services.AddCors(options =>
     {
         policy.AllowAnyHeader()
             .AllowAnyMethod()
-            //.WithOrigins(new string[] { "https://localhost:3000", "http://localhost:3000" }) 
-            .AllowAnyOrigin();
+            .WithOrigins(appSettings.CorsPolicyWithOrigins) 
+            .WithMethods("GET","POST")
+            .AllowCredentials()
+            ;
     });
 });
 
@@ -57,7 +59,7 @@ builder.Host.UseSerilog((ctx, lc) => lc
 .ReadFrom.Configuration(ctx.Configuration));
 
 var app = builder.Build();
-    app.UseSwagger();
+app.UseSwagger();
 app.UseSwaggerUI(options =>
 {
     options.SwaggerEndpoint("/swagger/v1/swagger.json", "v1");
@@ -68,7 +70,7 @@ app.UseMetricServer();
 app.UseAuthorization();
 
 app.MapControllers();
-app.MapHub<LightRoutesHub>("/hubs/lightroutes"); 
+app.MapHub<LightRoutesHub>("/hubs/lightroutes");
 app.UseCors("ClientPermission");
 using var scope = app.Services.CreateScope();
 var k8SClientService = scope.ServiceProvider?.GetService<K8SClientService>();
