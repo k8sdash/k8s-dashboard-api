@@ -31,5 +31,5 @@ jobs:
       
       - name: Build and push Docker image
         run: |
-          docker build -f Client.Dockerfile -t k8s-dashboard-client:0.4.1
+          docker build -f Client.Dockerfile . -t k8s-dashboard-client:0.4.1
           docker push k8sdash/k8s-dashboard-client:0.4.1
