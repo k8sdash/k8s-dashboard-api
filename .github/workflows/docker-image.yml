@@ -29,7 +29,7 @@ jobs:
           images: |
             name/app
           tags: |
-            type=semver,pattern={{major}}.{{minor}}.((patch}}
+            type=semver,pattern={{major}}.{{minor}}.{{patch}}
       
       - name: Build and push Docker image
         run: |
