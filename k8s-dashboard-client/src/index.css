@@ -26,3 +26,8 @@ code {
     background-color: lightskyblue;
     color: white;
 }
+
+.completed {
+    background-color: lightsteelblue;
+    color: white;
+}

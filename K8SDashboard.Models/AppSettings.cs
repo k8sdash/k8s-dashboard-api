@@ -13,6 +13,5 @@
         public string? ApiContactUrl { get; set; }
         public string? ApiLicenseName { get; set; }
         public string? ApiLicenseUrl { get; set; }
-        public string[]? CorsPolicyWithOrigins { get; set;  }
     }
 }

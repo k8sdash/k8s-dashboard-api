@@ -96,7 +96,7 @@ export default class App extends Component {
                             <Link
                                 variant="button"
                                 color="text.primary"
-                                href={this.getBackendUrl() + "/index.html"} 
+                                href={this.getBackendUrl() + "/swagger"} 
                             sx={{ my: 1, mx: 1.5 }}
                         >
                             Swagger
@@ -300,16 +300,13 @@ export default class App extends Component {
 
 
     getBackendUrl() {
-        return this.getBackendUrlInternal(window.location.protocol, window.location.host);
-    }
-
-    getBackendUrlInternal(protocol, host) {
-        if (host === 'localhost:3000') {
-            // running in local dev server, connect to local dev backend
+        if (process.env.REACT_APP_LOCAL_BACKEND_HOST && typeof process.env.REACT_APP_LOCAL_BACKEND_HOST != "undefined" && process.env.REACT_APP_LOCAL_BACKEND_HOST != "undefined") {
+            console.log('using backend:' + process.env.REACT_APP_LOCAL_BACKEND_HOST);
             return process.env.REACT_APP_LOCAL_BACKEND_HOST;
-        } else {
-            // running in k8s, backend is on same host and port
-            return protocol + '//' + host;
+        }
+        else {
+            console.log('backend not specified, will resolve locally');
+            return '';
         }
     }
 }

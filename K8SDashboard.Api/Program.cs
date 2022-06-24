@@ -17,20 +17,13 @@ builder.Services.AddSingleton<K8SClientService>();
 builder.Services.AddSingleton<K8SEventManager>();
 builder.Services.AddSignalR(hubOptions =>
 {
-    //hubOptions.ClientTimeoutInterval = TimeSpan.FromSeconds(5);
-    //hubOptions.KeepAliveInterval = TimeSpan.FromSeconds(60);
-    //hubOptions.HandshakeTimeout = TimeSpan.FromSeconds(5);
 });
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("ClientPermission", policy =>
     {
-        policy.AllowAnyHeader()
-            .AllowAnyMethod()
-            .WithOrigins(appSettings.CorsPolicyWithOrigins) 
-            .WithMethods("GET","POST")
-            .AllowCredentials()
-            ;
+        policy.SetIsOriginAllowed(origin => new Uri(origin).Host == "localhost")
+            .WithMethods("GET", "POST");
     });
 });
 

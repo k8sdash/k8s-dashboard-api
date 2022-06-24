@@ -64,52 +64,62 @@ roleRef:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: k8s-dash-api
+  name: backend
   namespace: k8s-dash
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: k8s-dash-api
+      app: k8s-dash-app
+      tier: backend
   template:
     metadata:
       labels:
-        app: k8s-dash-api
+        app: k8s-dash-app
+        tier: backend
     spec: 
       serviceAccountName: k8s-dash-api-svc-acc
       nodeSelector:
         "kubernetes.io/os": linux
       containers:
       - name: k8s-dash-api
-        image: localhost:5000/k8s-dashboard-api:0.3.3
+        image: localhost:5000/k8s-dashboard-api:0.3.7
+        resources:
+          requests:
+            cpu: 250m
+          limits:
+            cpu: 500m
+            memory: 512Mi  
         ports:
         - containerPort: 80
-          name: k8s-dash-api
+          name: k8s-dash-app
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: k8s-dash-api
+  name: backend
   namespace: k8s-dash
 spec:
   type: LoadBalancer
   ports:
   - name: http
     targetPort: 80
-    port: 5183
+    port: 5184
   selector:
-    app: k8s-dash-api
+    app: k8s-dash-app
+    tier: backend
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: k8s-dash-client
+  name: frontend
   namespace: k8s-dash
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: k8s-dash-client
+      app: k8s-dash-app
+      tier: frontend
   strategy:
     rollingUpdate:
       maxSurge: 1
@@ -118,13 +128,14 @@ spec:
   template:
     metadata:
       labels:
-        app: k8s-dash-client
+        app: k8s-dash-app
+        tier: frontend
     spec:
       nodeSelector:
         "kubernetes.io/os": linux
       containers:
       - name: k8s-dash-client
-        image: localhost:5000/k8s-dashboard-client:0.0.8
+        image: localhost:5000/k8s-dashboard-client:0.2.6
         ports:
         - containerPort: 3000
         resources:
@@ -132,11 +143,12 @@ spec:
             cpu: 250m
           limits:
             cpu: 500m
+            memory: 512Mi  
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: k8s-dash-client
+  name: frontend
   namespace: k8s-dash
 spec:
   type: LoadBalancer
@@ -145,4 +157,34 @@ spec:
     targetPort: 80
     port: 3000
   selector:
-    app: k8s-dash-client
+    app: k8s-dash-app
+    tier: frontend
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ingress-k8s-dash
+  namespace: k8s-dash
+  annotations:
+    nginx.ingress.kubernetes.io/use-regex: "true"
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+spec:
+  rules:
+  - host: k8sdash.foo.org
+    http:
+      paths: 
+      - path: /k8scluster/lightroutes
+        pathType: Prefix
+        backend:
+          service:
+            name: backend
+            port:
+              number: 80   
+      - path: /(.*)
+        pathType: Prefix
+        backend:
+          service:
+            name: frontend
+            port:
+              number: 3000   
+  ingressClassName: nginx

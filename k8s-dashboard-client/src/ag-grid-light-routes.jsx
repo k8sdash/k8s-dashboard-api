@@ -11,7 +11,8 @@ export const GridLightRoutes = ({
     let cellClassRulesPodPhase = {
         'pending': (params) => { return params?.data?.podPhase === "Pending" },
         'failed': (params) => { return params?.data?.podPhase === "Failed" },
-        'running': (params) => { return params?.data?.podPhase === "Running" }
+        'running': (params) => { return params?.data?.podPhase === "Running" },
+        'completed': (params) => { return params?.data?.podPhase === "Completed" }
     }
 
     const getRowId = params => params.data.id;
