@@ -25,6 +25,6 @@ jobs:
                 
       - name: Build and push Docker image
         run: |
-          docker build -f Client.Dockerfile . -t k8s-dashboard-client:${{ github.ref }}
-          docker image tag k8s-dashboard-client:${{ github.ref }} docker.io/k8sdash/k8s-dashboard-client:${{ github.ref }}
-          docker push docker.io/k8sdash/k8s-dashboard-client:${{ github.ref }}
+          docker build -f Client.Dockerfile . -t k8s-dashboard-client:${{ github.event.release.tag_name }}
+          docker image tag k8s-dashboard-client:${{ github.event.release.tag_name }} docker.io/k8sdash/k8s-dashboard-client:${{ github.event.release.tag_name }}
+          docker push docker.io/k8sdash/k8s-dashboard-client:${{ github.event.release.tag_name }}
