@@ -6,8 +6,6 @@ import 'ag-grid-community/dist/styles/ag-theme-balham.css';
 export const GridLightRoutes = ({
     onGridReady, onFirstDataRendered, lightRoutes
 }) => {
-
-
     let cellClassRulesPodPhase = {
         'pending': (params) => { return params?.data?.podPhase === "Pending" },
         'failed': (params) => { return params?.data?.podPhase === "Failed" },
@@ -40,7 +38,7 @@ export const GridLightRoutes = ({
                     pagination={true}
                     paginationPageSize={9999}
                     domLayout="autoHeight"
-                    skipHeaderOnAutoSize={true}
+                    skipHeaderOnAutoSize={false}
                     onGridReady={onGridReady}
                     onFirstDataRendered={onFirstDataRendered}
                     rowData={lightRoutes}

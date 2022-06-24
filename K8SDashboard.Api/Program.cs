@@ -4,6 +4,8 @@ using Serilog;
 using Prometheus;
 using Microsoft.OpenApi.Models;
 using K8SDashboard.Api;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Versioning;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -23,8 +25,18 @@ builder.Services.AddCors(options =>
     options.AddPolicy("ClientPermission", policy =>
     {
         policy.SetIsOriginAllowed(origin => new Uri(origin).Host == "localhost")
-            .WithMethods("GET", "POST");
+        .WithHeaders("x-requested-with", "x-signalr-user-agent")
+        .AllowCredentials()
+        .WithMethods("GET", "POST");
     });
+});
+builder.Services.AddApiVersioning(config =>
+{
+    config.DefaultApiVersion = new ApiVersion(1, 0);
+    config.AssumeDefaultVersionWhenUnspecified = true;
+    config.ReportApiVersions = true;
+    config.ApiVersionReader = new HeaderApiVersionReader("api-version");
+
 });
 
 builder.Services.AddSwaggerGen(options =>
@@ -56,7 +68,7 @@ app.UseSwagger();
 app.UseSwaggerUI(options =>
 {
     options.SwaggerEndpoint("/swagger/v1/swagger.json", "v1");
-    options.RoutePrefix = string.Empty;
+    options.RoutePrefix = "api";
 });
 
 app.UseMetricServer();

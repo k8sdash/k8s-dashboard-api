@@ -83,7 +83,7 @@ spec:
         "kubernetes.io/os": linux
       containers:
       - name: k8s-dash-api
-        image: localhost:5000/k8s-dashboard-api:0.3.7
+        image: k8sdash/k8s-dashboard-api:0.4.7
         resources:
           requests:
             cpu: 250m
@@ -135,7 +135,7 @@ spec:
         "kubernetes.io/os": linux
       containers:
       - name: k8s-dash-client
-        image: localhost:5000/k8s-dashboard-client:0.2.6
+        image: k8sdash/k8s-dashboard-client:0.4.7
         ports:
         - containerPort: 3000
         resources:
@@ -155,7 +155,7 @@ spec:
   ports:
   - name: http
     targetPort: 80
-    port: 3000
+    port: 3009
   selector:
     app: k8s-dash-app
     tier: frontend
@@ -170,10 +170,10 @@ metadata:
     nginx.ingress.kubernetes.io/ssl-redirect: "false"
 spec:
   rules:
-  - host: k8sdash.foo.org
+  - host: k8sdash.local
     http:
-      paths: 
-      - path: /k8scluster/lightroutes
+      paths:   
+      - path: /(api|hubs|swagger)/(.*)
         pathType: Prefix
         backend:
           service:
@@ -186,5 +186,5 @@ spec:
           service:
             name: frontend
             port:
-              number: 3000   
+              number: 3009  
   ingressClassName: nginx

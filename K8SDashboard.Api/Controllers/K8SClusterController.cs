@@ -5,7 +5,9 @@ using Microsoft.AspNetCore.Mvc;
 namespace K8SDashboard.Api.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("api/[controller]", Order = 1)]
+    [Route("api/v{version:apiVersion}/[controller]", Order = 2)]
+    [ApiVersion("1.0")]
     public class K8SClusterController : ControllerBase
     {
         private readonly IK8SClientService k8SClientService;

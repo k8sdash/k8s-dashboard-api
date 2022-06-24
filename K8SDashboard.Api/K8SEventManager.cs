@@ -30,7 +30,7 @@ namespace K8SDashboard.Api
                 return;
             }
             var k8sEvent = (K8SPodEventArgs)e;
-            logger.LogDebug("aSignalR EventHub picked K8S event of Type '{Type}' on Pod '{Pod}'", k8sEvent.EventType, k8sEvent.PodName);
+            logger.LogDebug("a SignalR EventHub picked K8S event of Type '{Type}' on Pod '{Pod}'", k8sEvent.EventType, k8sEvent.PodName);
             hubContext.Clients.All.Propagate(k8sEvent.PodName, k8sEvent.EventType);
         }
     }
