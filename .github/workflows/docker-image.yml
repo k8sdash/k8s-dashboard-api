@@ -26,12 +26,12 @@ jobs:
                 
       - name: Build and push Docker image Client
         run: |
-          docker build -f Client.Dockerfile . -t k8s-dashboard-client:${{ github.event.release.tag_name }}
-          docker image tag k8s-dashboard-client:${{ github.event.release.tag_name }} docker.io/k8sdash/k8s-dashboard-client:${{ github.event.release.tag_name }}
-          docker push docker.io/k8sdash/k8s-dashboard-client:${{ github.event.release.tag_name }}
+          docker build -f Client.Dockerfile . -t k8s-dashboard-client:${{ github.tag }}
+          docker image tag k8s-dashboard-client:${{ github.tag }} docker.io/k8sdash/k8s-dashboard-client:${{ github.tag }}
+          docker push docker.io/k8sdash/k8s-dashboard-client:${{ github.tag }}
                 
       - name: Build and push Docker image Api
         run: |
-          docker build -f Api.Dockerfile . -t k8s-dashboard-api:${{ github.event.release.tag_name }}
-          docker image tag k8s-dashboard-api:${{ github.event.release.tag_name }} docker.io/k8sdash/k8s-dashboard-api:${{ github.event.release.tag_name }}
-          docker push docker.io/k8sdash/k8s-dashboard-api:${{ github.event.release.tag_name }}
+          docker build -f Api.Dockerfile . -t k8s-dashboard-api:${{ github.tag }}
+          docker image tag k8s-dashboard-api:${{ github.tag }} docker.io/k8sdash/k8s-dashboard-api:${{ github.tag }}
+          docker push docker.io/k8sdash/k8s-dashboard-api:${{ github.tag }}
