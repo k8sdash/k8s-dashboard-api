@@ -4,9 +4,9 @@ EXPOSE 80
 
 FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
 WORKDIR /src
-COPY ["./", "K8SDashboard.Api/"]
-RUN dotnet restore "K8SDashboard.Api/K8SDashboard.Api.csproj"
 COPY . .
+RUN dotnet restore "K8SDashboard.Api/K8SDashboard.Api.csproj"
+
 WORKDIR "/src/K8SDashboard.Api" 
 RUN dotnet build "K8SDashboard.Api.csproj" -c Release -o /app/build
 
