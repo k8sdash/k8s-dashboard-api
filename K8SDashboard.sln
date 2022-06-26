@@ -9,8 +9,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "K8SDashboard.Models", "K8SD
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "K8SDashboard.Services", "K8SDashboard.Services\K8SDashboard.Services.csproj", "{8C173B29-B40E-4589-8AFB-5F7BA3463029}"
 EndProject
-Project("{54A90642-561A-4BB1-A94E-469ADEE60C69}") = "k8s-dashboard-client", "k8s-dashboard-client\k8s-dashboard-client.esproj", "{B25B9F80-1195-4637-A629-5792626E5F01}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -29,12 +27,6 @@ Global
 		{8C173B29-B40E-4589-8AFB-5F7BA3463029}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8C173B29-B40E-4589-8AFB-5F7BA3463029}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8C173B29-B40E-4589-8AFB-5F7BA3463029}.Release|Any CPU.Build.0 = Release|Any CPU
-		{B25B9F80-1195-4637-A629-5792626E5F01}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{B25B9F80-1195-4637-A629-5792626E5F01}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{B25B9F80-1195-4637-A629-5792626E5F01}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
-		{B25B9F80-1195-4637-A629-5792626E5F01}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{B25B9F80-1195-4637-A629-5792626E5F01}.Release|Any CPU.Build.0 = Release|Any CPU
-		{B25B9F80-1195-4637-A629-5792626E5F01}.Release|Any CPU.Deploy.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
