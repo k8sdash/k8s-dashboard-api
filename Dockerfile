@@ -4,7 +4,7 @@ EXPOSE 80
 
 FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
 WORKDIR /src
-COPY ["K8SDashboard.Api/", "K8SDashboard.Api/"]
+COPY ["./", "K8SDashboard.Api/"]
 RUN dotnet restore "K8SDashboard.Api/K8SDashboard.Api.csproj"
 COPY . .
 WORKDIR "/src/K8SDashboard.Api" 
