@@ -5,7 +5,7 @@ A simple .net 6.0 api to monitor Kubernetes, exposing ingress routes, pods and n
 
 ## TL;DR
 ```
-docker pull k8sdash/k8s-dashboard-api
+kubectl apply -f https://raw.githubusercontent.com/k8sdash/k8s-dashboard-charts/main/deploy-k8s-dashboard.yaml
 ```
 
 ### Before you begin
