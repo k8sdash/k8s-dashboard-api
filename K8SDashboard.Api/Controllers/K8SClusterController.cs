@@ -55,7 +55,7 @@ namespace K8SDashboard.Api.Controllers
                 if (lightRoutes != null)
                 {
                     logger.LogTrace("Got {Count} Grouped Light Routes", lightRoutes.Count);
-                    var groups = lightRoutes.GroupBy(p => (p.App, p.NodeIp, p.PodIp, p.PodPhase, p.Image, p.Ingress, p.NameSpace, p.Node, p.NodeAz, p.Pod));
+                    var groups = lightRoutes.GroupBy(p => (p.App, p.NodeIp, p.PodIp, p.PodPhase, p.Image, p.NameSpace, p.Node, p.NodeAz, p.Pod));
 
 
                     var groupedLightRoutes = groups.Select(g => new LightRoute {
@@ -63,7 +63,6 @@ namespace K8SDashboard.Api.Controllers
                         App = g.Key.App,
                         NodeIp = g.Key.NodeIp,
                         PodIp = g.Key.PodIp,
-                        Ingress = g.Key.Ingress,
                         Image = g.Key.Image,
                         NameSpace = g.Key.NameSpace,
                         Node = g.Key.Node, 
@@ -71,7 +70,8 @@ namespace K8SDashboard.Api.Controllers
                         Pod = g.Key.Pod,
                         PodPhase = g.Key.PodPhase,
                         Service = Display(g.Select(p=>p.Service).ToArray()),
-                        PodPort = Display(g.Select(p => p.PodPort).ToArray())
+                        PodPort = Display(g.Select(p => p.PodPort).ToArray()),
+                        Ingress = Display(g.Select(p => p.Ingress).ToArray())
                     });
 
                     return Ok(groupedLightRoutes);
