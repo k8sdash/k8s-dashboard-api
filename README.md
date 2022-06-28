@@ -11,4 +11,3 @@ kubectl apply -f https://raw.githubusercontent.com/k8sdash/k8s-dashboard-charts/
 ### Before you begin
 #### Prerequisites
 * Kubernetes 1.19+
-* Preferably an nginx ingress 
