@@ -13,5 +13,6 @@
         public string? ApiContactUrl { get; set; }
         public string? ApiLicenseName { get; set; }
         public string? ApiLicenseUrl { get; set; }
+        public string? DisplaySeparator { get; set; }
     }
 }

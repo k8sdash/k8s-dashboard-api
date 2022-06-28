@@ -105,14 +105,14 @@ namespace K8SDashboard.Services
                         {
                             Id = Guid.NewGuid(),
                             Node = x.p.Spec.NodeName,
-                            NodeIp = string.Join(",", x.n.Status?.Addresses?.Where(p => p?.Type == appSettings.K8sLabelInternalIp).Select(p => p?.Address)),
-                            PodPort = x.s.Spec != null && x.s.Spec.Ports != null && x.s.Spec.Ports.Any() ? string.Join(",", x.s.Spec.Ports.Select(p => p.Port)) : string.Empty,
+                            NodeIp = string.Join(appSettings.DisplaySeparator, x.n.Status?.Addresses?.Where(p => p?.Type == appSettings.K8sLabelInternalIp).Select(p => p?.Address)),
+                            PodPort = x.s.Spec != null && x.s.Spec.Ports != null && x.s.Spec.Ports.Any() ? string.Join(appSettings.DisplaySeparator, x.s.Spec.Ports.Select(p => p.Port).Distinct()) : string.Empty, // TODO probably want to show the protocol instead of hiding it
                             NodeAz = x.n.Metadata.Labels.ContainsKey(appSettings.K8sLabelAksZone) ? x.n.Metadata.Labels[appSettings.K8sLabelAksZone] : string.Empty,
                             Pod = x.p.Metadata.Name,
                             PodIp = x.p.Status.PodIP,
-                            Image = string.Join(",", x.p.Spec?.Containers?.Select(p => p?.Image ?? string.Empty)),
+                            Image = string.Join(appSettings.DisplaySeparator, x.p.Spec?.Containers?.Select(p => p?.Image ?? string.Empty)),
                             PodPhase = x.p.Status.Phase,
-                            Ingress = string.Join(",", x.r?.Host ?? string.Empty),
+                            Ingress = string.Join(appSettings.DisplaySeparator, x.r?.Host ?? string.Empty),
                             NameSpace = x.p.Metadata.NamespaceProperty,
                             Service = x.s.Metadata?.Name,
                             App = x.p.Metadata.Labels.ContainsKey(appSettings.K8sLabelApp) ? x.p.Metadata.Labels[appSettings.K8sLabelApp] : string.Empty
