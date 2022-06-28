@@ -2,3 +2,13 @@
 
 # k8s-dashboard-api
 A simple .net 6.0 api to monitor Kubernetes, exposing ingress routes, pods and nodes
+
+## TL;DR
+```
+docker pull k8sdash/k8s-dashboard-api
+```
+
+### Before you begin
+#### Prerequisites
+* Kubernetes 1.19+
+* Preferably an nginx ingress 
