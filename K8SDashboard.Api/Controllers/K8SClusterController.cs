@@ -85,11 +85,11 @@ namespace K8SDashboard.Api.Controllers
             }
         }
 
-        private string Display(IEnumerable<string> inputs)
+        private string Display(string?[] inputs)
         {
             if (inputs == null || !inputs.Any())
                 return String.Empty;
-            string[] a = inputs.SelectMany(x => x.Contains(appSettings.DisplaySeparator)? x.Split(appSettings.DisplaySeparator) : new string[] { x }).Distinct().OrderBy(p=>p).ToArray();
+            string[] a = inputs.Where(p=>!string.IsNullOrEmpty(p)).SelectMany(x => x.Contains(appSettings.DisplaySeparator)? x.Split(appSettings.DisplaySeparator) : new string[] { x }).Distinct().OrderBy(p=>p).ToArray();
             return string.Join(appSettings.DisplaySeparator, a);
         }
     }
