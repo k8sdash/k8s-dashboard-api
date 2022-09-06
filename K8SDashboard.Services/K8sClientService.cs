@@ -72,15 +72,15 @@ namespace K8SDashboard.Services
             try
             {
                 var nodes = await Get<V1Node>(retriesLeft, GetNodes);
-                var pods = await Get<V1Pod>(retriesLeft, GetPods);
-                var services = await Get<V1Service>(retriesLeft, GetServices);
+                var pods = (await Get<V1Pod>(retriesLeft, GetPods)).Where(p => p.Metadata.Labels.ContainsKey(appSettings.K8sLabelApp)) ;
+                var services = (await Get<V1Service>(retriesLeft, GetServices)).Where(s=> s.Spec.Selector != null && s.Spec.Selector.ContainsKey(appSettings.K8sLabelApp));
 
                 var nodePodServices =
                     from n in nodes
                     join p in pods
                     on n.Metadata.Name equals p.Spec.NodeName
                     join s in services
-                    on p.Metadata.Labels.ContainsKey(appSettings.K8sLabelApp) ? p.Metadata.Labels[appSettings.K8sLabelApp] : string.Empty equals s.Spec.Selector != null && s.Spec.Selector.ContainsKey(appSettings.K8sLabelApp) ? s.Spec.Selector?[appSettings.K8sLabelApp] : string.Empty into joined
+                    on p.Metadata.Labels[appSettings.K8sLabelApp] equals s.Spec.Selector?[appSettings.K8sLabelApp] into joined
                     from j in joined.DefaultIfEmpty()
                     select new { p, n, s = j ?? new V1Service() };
                 logger.LogDebug("Joined nods, pods and services. Counting {Count}", nodePodServices?.Count());
@@ -114,8 +114,7 @@ namespace K8SDashboard.Services
                             PodPhase = x.p.Status.Phase,
                             Ingress = string.Join(appSettings.DisplaySeparator, x.r?.Host ?? string.Empty),
                             NameSpace = x.p.Metadata.NamespaceProperty,
-                            Service = x.s.Metadata?.Name,
-                            App = x.p.Metadata.Labels.ContainsKey(appSettings.K8sLabelApp) ? x.p.Metadata.Labels[appSettings.K8sLabelApp] : string.Empty
+                            Service = x.s.Metadata?.Name
                         };
                         return lightRoute;
                     }

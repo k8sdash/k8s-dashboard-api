@@ -55,21 +55,21 @@ namespace K8SDashboard.Api.Controllers
                 if (lightRoutes != null)
                 {
                     logger.LogTrace("Got {Count} Grouped Light Routes", lightRoutes.Count);
-                    var groups = lightRoutes.GroupBy(p => (p.App, p.NodeIp, p.PodIp, p.PodPhase, p.Image, p.NameSpace, p.Node, p.NodeAz, p.Pod));
+                    var groups = lightRoutes.GroupBy(p => (p.NodeIp, p.PodIp, p.PodPhase, p.Image, p.NameSpace, p.Node, p.NodeAz, p.Pod));
 
 
-                    var groupedLightRoutes = groups.Select(g => new LightRoute {
+                    var groupedLightRoutes = groups.Select(g => new LightRoute
+                    {
                         Id = Guid.NewGuid(),
-                        App = g.Key.App,
                         NodeIp = g.Key.NodeIp,
                         PodIp = g.Key.PodIp,
                         Image = g.Key.Image,
                         NameSpace = g.Key.NameSpace,
-                        Node = g.Key.Node, 
+                        Node = g.Key.Node,
                         NodeAz = g.Key.NodeAz,
                         Pod = g.Key.Pod,
                         PodPhase = g.Key.PodPhase,
-                        Service = Display(g.Select(p=>p.Service).ToArray()),
+                        Service = Display(g.Select(p => p.Service).ToArray()),
                         PodPort = Display(g.Select(p => p.PodPort).ToArray()),
                         Ingress = Display(g.Select(p => p.Ingress).ToArray())
                     });
@@ -89,7 +89,7 @@ namespace K8SDashboard.Api.Controllers
         {
             if (inputs == null || !inputs.Any())
                 return String.Empty;
-            string[] a = inputs.Where(p=>!string.IsNullOrEmpty(p)).SelectMany(x => x.Contains(appSettings.DisplaySeparator)? x.Split(appSettings.DisplaySeparator) : new string[] { x }).Distinct().OrderBy(p=>p).ToArray();
+            string[] a = inputs.Where(p => !string.IsNullOrEmpty(p)).SelectMany(x => x.Contains(appSettings.DisplaySeparator) ? x.Split(appSettings.DisplaySeparator) : new string[] { x }).Distinct().OrderBy(p => p).ToArray();
             return string.Join(appSettings.DisplaySeparator, a);
         }
     }
