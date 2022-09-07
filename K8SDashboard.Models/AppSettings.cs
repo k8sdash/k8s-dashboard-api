@@ -3,7 +3,8 @@
     public class AppSettings
     {
         public int KubeApiTimeout { get; set; }
-        public string? K8sLabelApp { get; set; }
+        public string? K8sLabelApp1 { get; set; }
+        public string? K8sLabelApp2 { get; set; }
         public string? K8sLabelInternalIp { get; set; }
         public string? K8sLabelAksZone { get; set; }
 
