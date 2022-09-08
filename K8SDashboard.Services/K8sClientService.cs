@@ -80,36 +80,29 @@ namespace K8SDashboard.Services
                     join p in pods
                     on n.Metadata.Name equals p.Spec.NodeName
                     join s in services
-                    on p.Metadata.Labels.ContainsKey(appSettings.K8sLabelApp1) ? p.Metadata.Labels[appSettings.K8sLabelApp1] : p.Metadata.Labels[appSettings.K8sLabelApp2] equals s.Spec.Selector.ContainsKey(appSettings.K8sLabelApp1) ? s.Spec.Selector[appSettings.K8sLabelApp1] : s.Spec.Selector[appSettings.K8sLabelApp2]  into joined
+                    on new
+                    {
+                        Label = p.Metadata.Labels.ContainsKey(appSettings.K8sLabelApp1) ? p.Metadata.Labels[appSettings.K8sLabelApp1] : p.Metadata.Labels[appSettings.K8sLabelApp2], 
+                        Namespace = p.Namespace()
+                    } equals new
+                    {
+                        Label = s.Spec.Selector.ContainsKey(appSettings.K8sLabelApp1) ? s.Spec.Selector[appSettings.K8sLabelApp1] : s.Spec.Selector[appSettings.K8sLabelApp2],
+                        Namespace = s.Namespace()
+                    } into joined
                     from j in joined.DefaultIfEmpty()
                     select new { p, n, s = j ?? new V1Service() };
                 logger.LogDebug("Joined nods, pods and services. Counting {Count}", nodePodServices?.Count());
 
                 var ingresses = await Get(retriesLeft, GetIngresses);
-                var rules = ingresses.SelectMany(p => p.Spec.Rules).Where(r=>r!=null);
-                logger.LogDebug("Extracted {CountRules} rules from {CountIngresses} ingresses", rules.Count(), ingresses.Count);
-
-                var paths = rules.SelectMany(r => r.Http?.Paths).Where(p => p != null);
-                logger.LogDebug("Extracted {CountPaths} paths from {CountRules} rules", paths.Count(), rules.Count());
-
-                var serviceToHost = new Dictionary<string, string>();
-                foreach (var rule in rules)
-                {
-                    if (rule != null && rule.Host != null)
-                        foreach (var path in rule.Http?.Paths)
-                        {
-                            var service = path.Backend?.Service?.Name;
-                            if (service != null && !serviceToHost.ContainsKey(service))
-                                serviceToHost.Add(service, rule.Host);
-                        }
-                }
-
+                var rules = ingresses.Select(p => p.Spec.Rules.Select(q => new { NameSpace = p.Namespace(), Rules = q })).SelectMany(p =>p);
+                var paths = rules.Select(p => p.Rules.Http.Paths.Select(q => new { NameSpace = p.NameSpace, Paths = q, Rules = p.Rules })).SelectMany(p => p);
+                
                 var nodePodServicePaths =
                     from nps in nodePodServices
                     join pa in paths
-                    on nps.s.Metadata?.Name equals pa?.Backend?.Service?.Name into joined
+                    on new { Name = nps.s.Metadata?.Name, NameSpace = nps.s.Namespace() } equals new { Name = pa.Paths.Backend?.Service?.Name, NameSpace = pa.NameSpace } into joined
                     from j in joined.DefaultIfEmpty()
-                    select new { nps.p, nps.n, nps.s, host = j ==null ? String.Empty : serviceToHost[j?.Backend?.Service?.Name]};
+                    select new { nps.p, nps.n, nps.s, host = j == null ? String.Empty : j.Rules.Host};
                 logger.LogDebug("Joined nods, pods, services and hosts. Counting {Count}", nodePodServicePaths.Count());
 
                 var lightRoutes = nodePodServicePaths.Select(x =>
