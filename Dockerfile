@@ -16,4 +16,7 @@ RUN dotnet publish "K8SDashboard.Api.csproj" -c Release -o /app/publish
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
+
+USER 1000
+
 ENTRYPOINT ["dotnet", "K8SDashboard.Api.dll"]
